@@ -1,0 +1,42 @@
+Project Explanation – Codeflow Overview
+
+Este proyecto implementa un flujo de automatización para la gestión y firma de documentos/certificados en la web de MITECO. Utiliza dos métodos principales de interacción:
+
+1. Selenium (a través de módulos como webConfiguration y webFunctions):  
+   - Configura y controla el navegador (Chrome) para la navegación en la web.  
+   - Abre la URL de MITECO, espera la carga de elementos clave (por ejemplo, "breadcrumb" o "wrapper") y realiza acciones de formulario (rellenar campos, seleccionar opciones, subir archivos, etc.).
+
+2. uiautomation (a través de módulos uiautomationHandler, certHandler y autoFirmaHandler):  
+   - Permite interactuar con diálogos y pop-ups del sistema, especialmente aquellos relacionados con la selección y uso del certificado digital.  
+   - Proporciona funciones para buscar ventanas por su título o clase, obtener controles recursivamente (por ejemplo, DataItemControl o RadioButton) y hacer clic en botones dentro de pop-ups.
+   
+Flujo Principal (Codeflow):
+
+a. mainCertificados.py (orquestador principal):
+   - Se inicia configurando el driver de Selenium mediante webConfiguration.
+   - Se abre la web de MITECO y se espera la carga de elementos iniciales.
+   - Se realizan clics para acceder a la sección “Acceso DNIe / Certificado electrónico”.
+   - Se invoca certHandler.seleccionar_certificado_chrome pasando una subcadena (por ejemplo, "FRANCISCO") para buscar y seleccionar el certificado adecuado.
+   - Se completa un formulario con datos (dirección, teléfono, etc.) utilizando funciones de webFunctions.
+   - Se envía el formulario y se procede con la carga de un archivo XML.
+   - Finalmente, se invoca autoFirmaHandler.firmar_en_autofirma para gestionar el proceso de firma digital y se cierra el navegador.
+
+b. certHandler.py:
+   - Contiene la lógica para la selección del certificado.
+   - La función _seleccionar_certificado recibe una lista de controles (obtenidos mediante uiautomationHandler.obtener_data_item_control) y busca aquel que contenga la subcadena indicada en su propiedad Name. 
+   - Luego, realiza un clic sobre el certificado encontrado y, utilizando uiautomationHandler.click_boton, hace clic en el botón “Aceptar” del popup “Seleccionar un certificado”.
+   - La función principal (seleccionar_certificado_chrome) integra estos pasos y se utiliza en mainCertificados.py para la autenticación.
+
+c. autoFirmaHandler.py:
+   - Orquesta el flujo de firma con AutoFirma.
+   - Incluye funciones para listar ventanas abiertas (para diagnosticar y depurar), obtener controles de tipo RadioButton, y para seleccionar certificados de forma similar a certHandler.py.
+   - La función firmar_en_autofirma utiliza uiautomationHandler para esperar y hacer clic en el popup “¿Abrir AutoFirma?”, tras lo cual se espera y se ejecuta la selección del certificado en el “Diálogo de seguridad de almacén Windows”.
+   - Una vez seleccionado el certificado, el proceso de firma continúa.
+
+d. uiautomationHandler.py:
+   - Permite interactuar con la capa de interfaz del sistema a través de uiautomation.
+   - Provee funciones como obtener_ventana_chrome (para localizar ventanas de Chrome) y click_boton (para buscar y hacer clic en botones dentro de pop-ups identificados por su nombre).
+   - También incluye esperar_popup_y_ejecutar, que espera la aparición de un popup y, opcionalmente, ejecuta una acción (por ejemplo, hacer clic) sobre dicho popup.
+   - La función obtener_data_item_control facilita la extracción recursiva de controles relevantes, como los que representan los certificados.
+
+En resumen, el proyecto integra Selenium para la interacción web y uiautomation para la interacción a nivel del sistema (selección de certificados y firma digital). mainCertificados.py coordina estas operaciones: primero se realiza la navegación web y se recogen los datos necesarios; posteriormente se invoca el proceso de firma digital, el cual utiliza los módulos certHandler.py y autoFirmaHandler.py para gestionar los diálogos de certificados y la firma en AutoFirma.

@@ -1,0 +1,42 @@
+[
+    {
+        "nombre_representante": "ECO TITAN S.L.",
+        "nif_representante": "19848505B",
+        "nombre_productor": "LUIS MIGUEL NOVILLO MOLINA",
+        "nif_productor": "70345107K",
+        "nombre_residuo": "FILTROS DE ACEITE*",
+        "regage": "REGAGE25e00050560925"
+    },
+    {
+        "nombre_representante": "ECO TITAN S.L.",
+        "nif_representante": "19848505B",
+        "nombre_productor": "LUIS MIGUEL NOVILLO MOLINA",
+        "nif_productor": "70345107K",
+        "nombre_residuo": "ACEITE USADO*",
+        "regage": "REGAGE25e00050561542"
+    },
+    {
+        "nombre_representante": "ECO TITAN S.L.",
+        "nif_representante": "19848505B",
+        "nombre_productor": "LUIS MIGUEL NOVILLO MOLINA",
+        "nif_productor": "70345107K",
+        "nombre_residuo": "ANTICONGELANTE*",
+        "regage": "REGAGE25e00050564159"
+    },
+    {
+        "nombre_representante": "ECO TITAN S.L.",
+        "nif_representante": "19848505B",
+        "nombre_productor": "LUIS MIGUEL NOVILLO MOLINA",
+        "nif_productor": "70345107K",
+        "nombre_residuo": "ENVASES METALICOS CONTAMINADOS*",
+        "regage": "REGAGE25e00050564543"
+    },
+    {
+        "nombre_representante": "ECO TITAN S.L.",
+        "nif_representante": "19848505B",
+        "nombre_productor": "LUIS MIGUEL NOVILLO MOLINA",
+        "nif_productor": "70345107K",
+        "nombre_residuo": "ENVASES PLASTICOS CONTAMINADOS*",
+        "regage": "REGAGE25e00050568420"
+    }
+]

@@ -1,0 +1,183 @@
+[
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "FILTROS DE ACEITE*",
+      "cantidad": "5000"
+    },
+    "centros": [
+      {
+        "centro": "SERVICIOS ECOLOGICOS ACITAIN, S.L.",
+        "tratamiento": "R4"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "ACEITE USADO*",
+      "cantidad": "8000"
+    },
+    "centros": [
+      {
+        "centro": "INGAROIL, S.L.U.",
+        "tratamiento": "R9"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "LÍQUIDO DE FRENOS*",
+      "cantidad": "1000"
+    },
+    "centros": [
+      {
+        "centro": "LAFARGEHOLCIM ESPA",
+        "tratamiento": "R1"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "ANTICONGELANTE*",
+      "cantidad": "5000"
+    },
+    "centros": [
+      {
+        "centro": "EUROPEA DEL TRATAMIENTO DE RESIDUOS COSTA AZAHAR 18, S.L.",
+        "tratamiento": "R3"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "ENVASES METALICOS CONTAMINADOS*",
+      "cantidad": "1000"
+    },
+    "centros": [
+      {
+        "centro": "SERVICIOS ECOLOGICOS ACITAIN, S.L.",
+        "tratamiento": "R4"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "ENVASES PLASTICOS CONTAMINADOS*",
+      "cantidad": "1000"
+    },
+    "centros": [
+      {
+        "centro": "MANC RECYCLAPLAST, S.L.",
+        "tratamiento": "R3"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "TRAPOS Y ABSORBENTES CONTAMINADOS*",
+      "cantidad": "2000"
+    },
+    "centros": [
+      {
+        "centro": "CTR MEDITERRANEO, S.L.",
+        "tratamiento": "R3"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "BATERÍAS DE PLOMO*",
+      "cantidad": "10000"
+    },
+    "centros": [
+      {
+        "centro": "JOSE JARE",
+        "tratamiento": "R13"
+      },
+      {
+        "centro": "METALURGICA DE MEDINA, S.A.",
+        "tratamiento": "R4"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "ABSORBENTES (SEPIOLITA)*",
+      "cantidad": "1500"
+    },
+    "centros": [
+      {
+        "centro": "CTR MEDITERRANEO, S.L.",
+        "tratamiento": "R3"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "AEROSOLES*",
+      "cantidad": "1000"
+    },
+    "centros": [
+      {
+        "centro": "SERVICIOS ECOLOGICOS ACITAIN, S.L.",
+        "tratamiento": "R4"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "peligroso",
+      "nombre": "HIDROCARBUROS CON AGUA*",
+      "cantidad": "2000"
+    },
+    "centros": [
+      {
+        "centro": "EUROPEA DEL TRATAMIENTO DE RESIDUOS COSTA AZAHAR 18, S.L.",
+        "tratamiento": "R3"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "no peligroso",
+      "nombre": "CHATARRA MECANICA",
+      "cantidad": "10000"
+    },
+    "centros": [
+      {
+        "centro": "JOSE JARE",
+        "tratamiento": "R12"
+      },
+      {
+        "centro": "ARCELORMITTAL SESTAO, S.L.U.",
+        "tratamiento": "R04"
+      }
+    ]
+  },
+  {
+    "residuo": {
+      "tipo": "no peligroso",
+      "nombre": "FILTROS DE AIRE",
+      "cantidad": "1500"
+    },
+    "centros": [
+      {
+        "centro": "RECICLATGES FENGOAL, S.L.",
+        "tratamiento": "R12"
+      },
+      {
+        "centro": "PAPELERA DE LA ALQUERIA, S.L.U.",
+        "tratamiento": "R03"
+      }
+    ]
+  }
+]
