@@ -59,35 +59,58 @@ def get_linkMiteco(regage_val, nif_productor, nif_representante):
 
 def autenticar_y_seleccionar_certificado(driver):
     """
-    Realiza el proceso de autenticación y selección de certificado en la web de MITECO.
+    Realiza el proceso de autenticación y selección de certificado en la web de MITECO,
+    con varios intentos en caso de fallo.
     """
-    webFunctions.esperar_elemento_por_id(driver, "breadcrumb")
-    webFunctions.clickar_boton_por_value(driver, "acceder")
-    webFunctions.clickar_boton_por_texto(driver, "Acceso DNIe / Certificado electrónico")
-    certHandler.seleccionar_certificado_chrome(info.get("NOMBRE_CERT"))
+    max_intentos = 100
+    for intento in range(1, max_intentos + 1):
+        try:
+            webFunctions.esperar_elemento_por_id(driver, "breadcrumb")
+            webFunctions.clickar_boton_por_value(driver, "acceder")
+            webFunctions.clickar_boton_por_texto(driver, "Acceso DNIe / Certificado electrónico")
+            certHandler.seleccionar_certificado_chrome(info.get("NOMBRE_CERT"))
+            logging.info(f"Autenticación completada en el intento {intento}.")
+            break
+        except Exception as e:
+            logging.warning(f"Intento {intento}/{max_intentos} fallido en autenticación: {e}")
+            time.sleep(0.5)
+    else:
+        logging.error(f"No se pudo completar la autenticación tras {max_intentos} intentos.")
+        raise Exception("Fallo en la autenticación tras varios intentos")
 
-def descargar_documentos(driver, linkMiteco, download_path, numDownloads=2):
+def descargar_documentos(driver, download_path, numDownloads=2):
     """
     Lanza la descarga de los documentos asociados a un expediente MITECO.
-    Cierra el navegador después de descargar los documentos necesarios.
+    El driver ya debe estar en la página correcta después de la autenticación.
+    Cierra el navegador inmediatamente después de hacer clic en los PDFs.
     """
-    webFunctions.abrir_web(driver, linkMiteco)
+    archivos_descargados = []
     old_state = downloadFunctions.snapshot_folder_state(download_path)
+    try:
+        # Lanzar descargas
+        webFunctions.clickar_todos_los_links(driver, ".pdf")
+        logging.info("Clic en los PDFs realizado.")
 
-    # Lanzar descargas
-    webFunctions.clickar_todos_los_links(driver, ".pdf")
+        # Esperar la descarga (sin navegador)
+        logging.info(f"Esperando {numDownloads} descargas en {download_path}...")
+        archivos_descargados = downloadFunctions.wait_for_new_download(download_path, old_state, numDownloads)
+        logging.info(f"Archivos descargados: {archivos_descargados}")
 
-    # Esperar la descarga
-    logging.info(f"Esperando {numDownloads} descargas en {download_path}...")
-    archivos_descargados = downloadFunctions.wait_for_new_download(download_path, old_state, numDownloads)
+    except Exception as e:
+        logging.error(f"Error durante la descarga de documentos: {e}")
+    finally:
+        try:
+            driver.quit()
+            logging.info("Navegador cerrado después de intentar descargar los PDFs.")
+        except Exception as quit_error:
+            logging.error(f"Error cerrando el navegador en finally: {quit_error}")
 
-    logging.info(f"Archivos descargados: {archivos_descargados}")
     return archivos_descargados
 
 def procesar_registro(registro):
     """
     Procesa un único registro de regage.json: abre el enlace, autentica, descarga y guarda los archivos.
-    Cierra el navegador después de procesar cada registro.
+    Cierra completamente el navegador después de hacer clic en los PDFs para evitar bloqueos.
     """
     regage = registro.get("regage", "")
     nif_productor = registro.get("nif_productor", "")
@@ -95,48 +118,96 @@ def procesar_registro(registro):
     nombre_productor = registro.get("nombre_productor", "desconocido").replace(" ", "_")
     nombre_residuo = registro.get("nombre_residuo", "desconocido").replace(" ", "_").replace("*", "")
 
+    driver = None
+    logging.info(f"Iniciando procesamiento para regage={regage}, productor={nif_productor}, representante={nif_representante}")
+    
     try:
         # Construir la URL
         linkMiteco = get_linkMiteco(regage, nif_productor, nif_representante)
-        logging.info(f"Abrir enlace: {linkMiteco}")
+        logging.info(f"Procesando registro: {nombre_residuo} ({nombre_productor})")
+        logging.info(f"Enlace a abrir: {linkMiteco}")
 
-        # Configurar el navegador y abrir la URL
+        # Configurar el navegador
         driver = webConfiguration.configure()
         if not driver:
             logging.error("No se pudo iniciar el navegador.")
-            return
+            return None
 
-        webFunctions.abrir_web(driver, linkMiteco)
+        # Intentar abrir la web con reintentos
+        max_intentos = 100
+        for intento in range(1, max_intentos + 1):
+            try:
+                webFunctions.abrir_web(driver, linkMiteco)
+                logging.info(f"Web abierta correctamente en el intento {intento}.")
+                break
+            except Exception as e:
+                logging.warning(f"Intento {intento}/{max_intentos} fallido al abrir la web: {e}")
+                time.sleep(0.5)
+        else:
+            logging.error(f"No se pudo abrir la web tras {max_intentos} intentos.")
+            return None
 
-        # Autenticar y seleccionar certificado
-        autenticar_y_seleccionar_certificado(driver)
+        # Autenticar y seleccionar certificado con reintentos
+        max_intentos_auth = 50
+        for intento in range(1, max_intentos_auth + 1):
+            try:
+                autenticar_y_seleccionar_certificado(driver)
+                logging.info(f"Autenticación completada en el intento {intento}.")
+                break
+            except Exception as e:
+                logging.warning(f"Intento de autenticación {intento}/{max_intentos_auth} fallido: {e}")
+                time.sleep(0.5)
+        else:
+            logging.error(f"No se pudo completar la autenticación tras {max_intentos_auth} intentos.")
+            return None
+
+        # Volver a abrir el enlace después de la autenticación con reintentos
+        for intento in range(1, max_intentos + 1):
+            try:
+                webFunctions.abrir_web(driver, linkMiteco)
+                logging.info(f"Web reabierta después de autenticación en el intento {intento}.")
+                break
+            except Exception as e:
+                logging.warning(f"Intento {intento}/{max_intentos} fallido al reabrir la web: {e}")
+                time.sleep(0.5)
+        else:
+            logging.error(f"No se pudo reabrir la web tras {max_intentos} intentos.")
+            return None
 
         # Configurar carpeta de descargas única para este producto
         download_path = downloadFunctions.setup_descarga(driver, nombre_productor, nombre_residuo)
 
-        # Descargar documentos y cerrar el navegador
-        archivos_descargados = descargar_documentos(driver, linkMiteco, download_path)
-        downloadFunctions.finalizar_descarga(driver)
+        # Descargar documentos (se cerrará el navegador dentro de esta función)
+        archivos_descargados = descargar_documentos(driver, download_path)
+        driver = None  # El driver ya fue cerrado en descargar_documentos
+        
         logging.info(f"Descarga finalizada para {nombre_residuo} ({nombre_productor}).")
-        driver.quit()  # Cierra el navegador después de descargar los documentos
+        logging.info(f"Archivos descargados: {archivos_descargados}")
+        
         return archivos_descargados
 
     except TimeoutException as e:
         logging.error(f"Timeout al procesar registro: regage={regage}, productor={nif_productor}, representante={nif_representante}. Error: {e}")
+        return None
     except WebDriverException as e:
         logging.error(f"Error del navegador al procesar registro: regage={regage}, productor={nif_productor}, representante={nif_representante}. Error: {e}")
+        return None
     except Exception as e:
         logging.error(f"Error procesando registro: regage={regage}, productor={nif_productor}, representante={nif_representante}. Error: {e}")
+        return None
     finally:
-        try:
-            driver.quit()
-        except Exception as quit_error:
-            logging.error(f"Error cerrando el navegador: {quit_error}")
+        # Cerrar completamente el navegador si aún está abierto
+        if driver:
+            try:
+                driver.quit()
+                logging.info(f"Navegador cerrado en finally para {nombre_residuo} ({nombre_productor}).")
+            except Exception as quit_error:
+                logging.error(f"Error cerrando el navegador en finally: {quit_error}")
 
 def procesar_multiple_regages(max_registros=10):
     """
     Procesa un número limitado de registros de /output/{nombre_productor}/regage_{nombre_residuo}.json.
-    Cierra y abre un nuevo navegador para cada registro.
+    Cada registro abre un nuevo navegador, procesa y lo cierra inmediatamente.
     """
     output_base = os.path.join(BASE_DIR, "output")
     if not os.path.exists(output_base):
@@ -157,6 +228,8 @@ def procesar_multiple_regages(max_registros=10):
                 return
 
             ruta_json = os.path.join(carpeta, archivo_json)
+            logging.info(f"Procesando archivo {registros_procesados + 1}/{max_registros}: {archivo_json}")
+            
             with open(ruta_json, "r", encoding="utf-8") as f:
                 try:
                     registro = json.load(f)
@@ -164,12 +237,9 @@ def procesar_multiple_regages(max_registros=10):
                     logging.error(f"Error leyendo {ruta_json}: {e}")
                     continue
 
-            # Procesar el registro y cerrar el navegador después de cada uno
-            procesar_registro(registro)
+            # Procesar el registro (abre navegador, procesa y lo cierra)
+            archivos_descargados = procesar_registro(registro)
             registros_procesados += 1
-
-            # Pausa para evitar sobrecargar el servidor
-            time.sleep(5)
 
             # Mover el archivo procesado a la carpeta trash
             trash_dir = os.path.join(BASE_DIR, "trash")
@@ -180,6 +250,12 @@ def procesar_multiple_regages(max_registros=10):
                 logging.info(f"Archivo {os.path.basename(ruta_json)} movido a {destino}.")
             except Exception as e:
                 logging.error(f"Error al mover {ruta_json} a trash: {e}")
+
+            # Pausa entre registros para evitar bloqueos
+            logging.info(f"Esperando 10 segundos antes del siguiente registro...")
+            time.sleep(10)
+
+    logging.info(f"Procesamiento completado. Total de registros procesados: {registros_procesados}")
 
 
 if __name__ == "__main__":

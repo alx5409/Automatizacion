@@ -1168,34 +1168,38 @@ def crear_notificacion_tratamiento(driver, ruta_destino=None, provincia: str = "
     Crea una notificación en la plataforma Nubelus.
     Descarga el archivo en la carpeta 'ruta_destino' si se indica, si no en 'input'.
     """
+    logging.info(f"Creando notificación de tratamiento en la ruta: {ruta_destino}.")
     webFunctions.seleccionar_elemento_por_id(driver, "fContenido_seleccionado", "Notificación")
     time.sleep(1)
     try:
-        provincia_normalizada = quitar_tildes(str(provincia)).strip().upper()
-        provincias_validas = [
-            "VALENCIA", "ALICANTE", "CASTELLON",
-            "VALÈNCIA", "ALACANT", "CASTELLÓ",
-            "CASTELLÓN"
-        ]
-        provincias_validas_normalizadas = [quitar_tildes(p).strip().upper() for p in provincias_validas]
-
-        # Siempre guardar en la carpeta con el nombre del PDF, pero en output o input según provincia
-        if provincia_normalizada in provincias_validas_normalizadas:
-            base_folder = os.path.join(BASE_DIR, "output")
-        else:
-            base_folder = os.path.join(BASE_DIR, "input")
-
-        # ruta_destino debe ser el nombre de la carpeta preparada con el nombre del PDF
+        # Usar directamente ruta_destino, que ya viene con la carpeta correcta
         if ruta_destino is not None:
-            download_path = os.path.join(base_folder, os.path.basename(ruta_destino))
+            download_path = ruta_destino  # Ya viene como input/nombre_cliente o output/nombre_cliente
         else:
-            # Si no se pasa ruta_destino, usar la carpeta base (output o input)
-            download_path = base_folder
+            # Solo si no se pasa ruta_destino, usar carpeta base según provincia
+            provincia_normalizada = quitar_tildes(str(provincia)).strip().upper()
+            provincias_validas = [
+                "VALENCIA", "ALICANTE", "CASTELLON",
+                "VALÈNCIA", "ALACANT", "CASTELLÓ",
+                "CASTELLÓN"
+            ]
+            provincias_validas_normalizadas = [quitar_tildes(p).strip().upper() for p in provincias_validas]
+            
+            if provincia_normalizada in provincias_validas_normalizadas:
+                download_path = os.path.join(BASE_DIR, "output")
+            else:
+                download_path = os.path.join(BASE_DIR, "input")
+
+        logging.info(f"Valor de ruta_destino: {ruta_destino}")
+        logging.info(f"Valor final de download_path: {download_path}")
 
         downloadFunctions.ensure_download_path(download_path)
         downloadFunctions.configure_driver_download_path(driver, download_path)
 
         old_state = downloadFunctions.snapshot_folder_state(download_path)
+
+        provincia_normalizada = quitar_tildes(str(provincia)).strip().upper()
+        provincias_validas_normalizadas = [quitar_tildes(p).strip().upper() for p in ["VALENCIA", "ALICANTE", "CASTELLON", "VALÈNCIA", "ALACANT", "CASTELLÓ", "CASTELLÓN"]]
 
         if provincia_normalizada not in provincias_validas_normalizadas:
             webFunctions.clickar_boton_por_clase(driver, "icon-magic")
@@ -1453,6 +1457,7 @@ def esperar_descarga_completa(ruta_archivo, timeout=30):
 def descargar_excel_entidades(driver):
     """
     Descarga el Excel de entidades desde Nubelus y devuelve un DataFrame con su contenido.
+   
     """
     try:
         webFunctions.abrir_web(driver, WEB_NUBELUS_ENTIDAD)
