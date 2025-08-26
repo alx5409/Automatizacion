@@ -134,7 +134,7 @@ def procesar_registro(registro):
             return None
 
         # Intentar abrir la web con reintentos
-        max_intentos = 100
+        max_intentos = 5000
         for intento in range(1, max_intentos + 1):
             try:
                 webFunctions.abrir_web(driver, linkMiteco)
@@ -148,7 +148,7 @@ def procesar_registro(registro):
             return None
 
         # Autenticar y seleccionar certificado con reintentos
-        max_intentos_auth = 50
+        max_intentos_auth = 5000
         for intento in range(1, max_intentos_auth + 1):
             try:
                 autenticar_y_seleccionar_certificado(driver)
@@ -204,7 +204,7 @@ def procesar_registro(registro):
             except Exception as quit_error:
                 logging.error(f"Error cerrando el navegador en finally: {quit_error}")
 
-def procesar_multiple_regages(max_registros=10):
+def procesar_multiple_regages(max_registros=100):
     """
     Procesa un número limitado de registros de /output/{nombre_productor}/regage_{nombre_residuo}.json.
     Cada registro abre un nuevo navegador, procesa y lo cierra inmediatamente.

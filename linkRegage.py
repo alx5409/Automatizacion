@@ -144,12 +144,12 @@ def procesar_multiple_regages():
         # Una vez procesado el archivo, moverlo a la carpeta trash
         trash_dir = os.path.join(BASE_DIR, "trash")
         os.makedirs(trash_dir, exist_ok=True)
-        destino = os.path.join(trash_dir, os.path.basename(json_file))
+        destino = os.path.join(trash_dir, os.path.basename(archivo_json))
         try:
-            shutil.move(json_file, destino)
-            logging.info(f"Archivo {os.path.basename(json_file)} movido a {destino}.")
+            shutil.move(archivo_json, destino)
+            logging.info(f"Archivo {os.path.basename(archivo_json)} movido a {destino}.")
         except Exception as e:
-            logging.error(f"Error al mover {json_file} a trash: {e}")
+            logging.error(f"Error al mover {archivo_json} a trash: {e}")
 
 if __name__ == "__main__":
     procesar_multiple_regages()

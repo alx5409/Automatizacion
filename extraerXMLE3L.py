@@ -24,7 +24,7 @@ def guardar_regage_json(data, output_dir, nombre_residuo, codigo_regage):
     Guarda el contenido en un archivo {codigo_regage}_{nombre_residuo}.json en output_dir.
     Si ya existe, crea {codigo_regage}_{nombre_residuo}_1.json, etc. para no sobrescribir.
     """
-    base_name = f"{codigo_regage}_{normalizar_nombre(nombre_residuo)}"
+    base_name = f"{codigo_regage}_{nombre_residuo}"
     ext = ".json"
     filename = base_name + ext
     counter = 1

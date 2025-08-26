@@ -126,7 +126,7 @@ def actualizar_fechas_xml(xml_path):
         f.write(xml_text)
     return xml_path
 
-def guardar_regage_json(data, output_dir):
+def guardar_regage_json(data, output_dir,regage_number):
     """
     Guarda el contenido en un archivo regage.json en output_dir.
     Si ya existe, crea regage_1.json, regage_2.json, etc. para no sobrescribir.
@@ -137,7 +137,7 @@ def guardar_regage_json(data, output_dir):
     counter = 1
     full_path = os.path.join(output_dir, filename)
     while os.path.exists(full_path):
-        filename = f"{base_name}_{counter}{ext}"
+        filename = f"{base_name}_{regage_number}_{counter}{ext}"
         full_path = os.path.join(output_dir, filename)
         counter += 1
     with open(full_path, "w", encoding="utf-8") as f:
