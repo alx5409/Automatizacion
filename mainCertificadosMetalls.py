@@ -73,7 +73,7 @@ WEB_MITECO = (
 )
 URL_CONTRATOS_TRATAMIENTOS = "https://portal.nubelus.es/?clave=waster2_gestionContratosTratamiento"
 INPUT_DIR = os.path.join(BASE_DIR, "input")
-EXCEL_INPUT_DIR = os.path.join(BASE_DIR, "entrada", "excel_input.xls")  # Ruta del Excel de entrada
+EXCEL_INPUT_DIR = os.path.join(BASE_DIR, "entrada", "excel_input.xls")
 TRASH_DIR = os.path.join(BASE_DIR, "trash")
 INFO_CERTS = os.path.join(BASE_DIR, "data", "informacionCertsMetalls.txt")
 info = cargar_variables(INFO_CERTS)
@@ -85,9 +85,9 @@ def get_pdf_file_from_folder(folder_path):
     """
     for f in os.listdir(folder_path):
         if f.lower().endswith('.pdf'):
-            logging.info(f"Archivo PDF encontrado: {f}")
+            logging.info("[INFO-01] Archivo PDF encontrado: %s", f)
             return os.path.join(folder_path, f)
-    logging.error(f"No se encontró ningún archivo PDF en la carpeta '{folder_path}'.")
+    logging.error("[ERR-01] No se encontró ningún archivo PDF en la carpeta '%s'.", folder_path)
     return None
 
 def actualizar_fechas_xml(xml_path):
@@ -178,7 +178,7 @@ def procesar_xml(xml_path, nif):
     Procesa un archivo XML: automatiza el flujo web, ejecuta la firma y extrae la información relevante.
     Si ocurre cualquier error, se informa y se cierra el driver actual.
     """
-    logging.info(f"--- Procesando archivo XML: {os.path.basename(xml_path)} ---")
+    logging.info("[INFO-02] --- Procesando archivo XML: %s ---", os.path.basename(xml_path))
     driver = webConfiguration.configure()
     try:
         webFunctions.abrir_web(driver, WEB_MITECO)
@@ -211,20 +211,20 @@ def procesar_xml(xml_path, nif):
         autoFirmaHandler.firmar_en_autofirma()
 
         regage = webFunctions.obtener_texto_por_parte(driver, "Descargar Justificante:").split()[-1]
-        logging.info(f"Código de justificante obtenido: {regage}")
+        logging.info("[INFO-03] Código de justificante obtenido: %s", regage)
 
         json_result = extraerXMLE3L.extraer_info_xml(xml_path, regage)
-        logging.info(f"Información extraída del XML: {json_result}")
+        logging.info("[INFO-04] Información extraída del XML: %s", json_result)
 
         return json_result
 
     except Exception as e:
-        logging.error(f"Error procesando '{os.path.basename(xml_path)}': {e}", exc_info=True)
+        logging.error("[ERR-02] Error procesando '%s': %s", os.path.basename(xml_path), e, exc_info=True)
     finally:
         try:
             driver.quit()
         except Exception as e_quit:
-            logging.error(f"Error cerrando driver: {e_quit}")
+            logging.error("[ERR-03] Error cerrando driver: %s", e_quit)
 
 def procesar_archivos_xml_en_subcarpetas():
     """
@@ -234,34 +234,34 @@ def procesar_archivos_xml_en_subcarpetas():
     """
     subcarpetas = [os.path.join(INPUT_DIR, d) for d in os.listdir(INPUT_DIR) if os.path.isdir(os.path.join(INPUT_DIR, d))]
     if not subcarpetas:
-        logging.info("No se encontraron subcarpetas en la carpeta 'input'.")
+        logging.info("[INFO-05] No se encontraron subcarpetas en la carpeta 'input'.")
         return
 
     for subdir in subcarpetas:
-        logging.info(f"Procesando subcarpeta: {os.path.basename(subdir)}")
+        logging.info("[INFO-06] Procesando subcarpeta: %s", os.path.basename(subdir))
         xml_files = sorted([os.path.join(subdir, f) for f in os.listdir(subdir) if f.lower().endswith('.xml')])
 
         while xml_files:
             procesados_esta_vuelta = []
             for xml_file in xml_files:
                 try:
-                    primera_palabra = os.path.basename(subdir).split()[0]
-                    resultado = procesar_xml(xml_file, primera_palabra)
+                    nif = os.path.basename(subdir).split()[0]
+                    resultado = procesar_xml(xml_file, nif)
                     if resultado is None:
                         continue
                     nombre_productor = resultado.get("nombre_productor", "desconocido").replace(" ", "_")
                     mover_a_trash(xml_file, nombre_productor)
                     procesados_esta_vuelta.append(xml_file)
                 except Exception as e:
-                    logging.error(f"Error procesando '{os.path.basename(xml_file)}': {e}")
+                    logging.error("[ERR-04] Error procesando '%s': %s", os.path.basename(xml_file), e)
 
             xml_files = sorted([os.path.join(subdir, f) for f in os.listdir(subdir) if f.lower().endswith('.xml')])
             if not procesados_esta_vuelta and xml_files:
-                logging.error(f"No se ha podido procesar ninguno de los archivos XML restantes en {subdir}.")
+                logging.error("[ERR-05] No se ha podido procesar ninguno de los archivos XML restantes en %s.", subdir)
                 break
-        logging.info(f"Procesamiento completado para subcarpeta: {os.path.basename(subdir)}")
+        logging.info("[INFO-07] Procesamiento completado para subcarpeta: %s", os.path.basename(subdir))
 
-    logging.info("Proceso completado. Todas las subcarpetas procesadas.")
+    logging.info("[INFO-08] Proceso completado. Todas las subcarpetas procesadas.")
 
 def notificar_contratos_tratamiento():
     excel_input = pd.read_excel(EXCEL_INPUT_DIR)
@@ -278,7 +278,7 @@ def notificar_contratos_tratamiento():
     webFunctions.clickar_boton_por_clase(driver, "miBoton.buscar")
     # Edita las notificaciones de peligrosos a: Sí
     excelFunctions.editar_notificaciones_peligrosos(driver)
-    logging.info("Notificaciones de peligrosos editadas correctamente.")
+    logging.info("[INFO-09] Notificaciones de peligrosos editadas correctamente.")
     driver.quit()
     
 def main():
@@ -286,10 +286,10 @@ def main():
     Función principal que marca como notificado el contrato en nubelus e inicia el procesamiento de los archivos XML en todas las subcarpetas de input.
     """
     # notificar_contratos_tratamiento()
-    # logging.info("Notificaciones de contratos de tratamiento editadas correctamente.")
+    # logging.info("[INFO-10] Notificaciones de contratos de tratamiento editadas correctamente.")
 
     procesar_archivos_xml_en_subcarpetas()
-    logging.info("Todos los procesos han finalizado correctamente.")
+    logging.info("[INFO-11] Todos los procesos han finalizado correctamente.")
 
 if __name__ == "__main__":
     main()

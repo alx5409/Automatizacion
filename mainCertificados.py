@@ -74,8 +74,8 @@ WEB_MITECO = (
 URL_CONTRATOS_TRATAMIENTOS = "https://portal.nubelus.es/?clave=waster2_gestionContratosTratamiento"
 INPUT_DIR = os.path.join(BASE_DIR, "input")
 EXCEL_INPUT_DIR = os.path.join(BASE_DIR, "entrada", "excel_input.xls")  # Ruta del Excel de entrada
-TRASH_DIR = os.path.join(BASE_DIR, "trash") # Carpeta de archivos movidos a trash
-INFO_CERTS = os.path.join(BASE_DIR, "data", "informacionCerts.txt") # Archivo de información para hacer los certificados
+TRASH_DIR = os.path.join(BASE_DIR, "trash")
+INFO_CERTS = os.path.join(BASE_DIR, "data", "informacionCerts.txt")
 info = cargar_variables(INFO_CERTS)
 
 def get_pdf_file_from_folder(folder_path):
@@ -85,9 +85,9 @@ def get_pdf_file_from_folder(folder_path):
     """
     for f in os.listdir(folder_path):
         if f.lower().endswith('.pdf'):
-            logging.info(f"Archivo PDF encontrado: {f}")
+            logging.info("[INFO-01] Archivo PDF encontrado: %s", f)
             return os.path.join(folder_path, f)
-    logging.error(f"No se encontró ningún archivo PDF en la carpeta '{folder_path}'.")
+    logging.error("[ERR-01] No se encontró ningún archivo PDF en la carpeta '%s'.", folder_path)
     return None
 
 def actualizar_fechas_xml(xml_path):
@@ -126,7 +126,7 @@ def actualizar_fechas_xml(xml_path):
         f.write(xml_text)
     return xml_path
 
-def guardar_regage_json(data, output_dir,regage_number):
+def guardar_regage_json(data, output_dir):
     """
     Guarda el contenido en un archivo regage.json en output_dir.
     Si ya existe, crea regage_1.json, regage_2.json, etc. para no sobrescribir.
@@ -137,7 +137,7 @@ def guardar_regage_json(data, output_dir,regage_number):
     counter = 1
     full_path = os.path.join(output_dir, filename)
     while os.path.exists(full_path):
-        filename = f"{base_name}_{regage_number}_{counter}{ext}"
+        filename = f"{base_name}_{counter}{ext}"
         full_path = os.path.join(output_dir, filename)
         counter += 1
     with open(full_path, "w", encoding="utf-8") as f:
@@ -169,16 +169,26 @@ def autenticar_y_seleccionar_certificado(driver):
     """
     Realiza el proceso de autenticación y selección de certificado en la web de MITECO.
     """
-    webFunctions.clickar_boton_por_value(driver, "acceder")
-    webFunctions.clickar_boton_por_texto(driver, "Acceso DNIe / Certificado electrónico")
-    certHandler.seleccionar_certificado_chrome(info.get("NOMBRE_CERT"))
+    max_intentos = 100
+    intentos = 0
+    while intentos < max_intentos:
+        try:
+            webFunctions.clickar_boton_por_value(driver, "acceder")
+            webFunctions.clickar_boton_por_texto(driver, "Acceso DNIe / Certificado electrónico")
+            certHandler.seleccionar_certificado_chrome(info.get("NOMBRE_CERT"))
+            logging.info("Certificado seleccionado correctamente.")
+            return
+        except (TimeoutException, NoSuchElementException, ElementNotInteractableException) as e:
+            intentos += 1
+            logging.warning(f"Intento {intentos}/{max_intentos} fallido para seleccionar certificado: {e}")
+            time.sleep(2)
 
-def procesar_xml(xml_path, get_pdf_file_func):
+def procesar_xml(xml_path, nif):
     """
     Procesa un archivo XML: automatiza el flujo web, ejecuta la firma y extrae la información relevante.
     Si ocurre cualquier error, se informa y se cierra el driver actual.
     """
-    logging.info(f"--- Procesando archivo XML: {os.path.basename(xml_path)} ---")
+    logging.info("[INFO-02] --- Procesando archivo XML: %s ---", os.path.basename(xml_path))
     driver = webConfiguration.configure()
     try:
         webFunctions.abrir_web(driver, WEB_MITECO)
@@ -186,6 +196,10 @@ def procesar_xml(xml_path, get_pdf_file_func):
 
         autenticar_y_seleccionar_certificado(driver)
         webFunctions.esperar_elemento_por_id(driver, "wrapper", timeout=15)
+        webFunctions.clickar_boton_por_id(driver, "id_presenta_solicitud_3")
+        webFunctions.escribir_en_elemento_por_id(driver, "id_nif_remitente", nif)
+        webFunctions.clickar_boton_por_id(driver, "id_btnOtroSol")
+        time.sleep(1)
         rellenar_formulario(driver)
 
         webFunctions.clickar_boton_por_id(driver, "btnForm")
@@ -197,8 +211,7 @@ def procesar_xml(xml_path, get_pdf_file_func):
 
         webFunctions.clickar_boton_por_clase(driver, "loginBtn")
         webFunctions.clickar_boton_por_texto(driver, "Continuar")
-        pdf_file = get_pdf_file_func()
-        webFunctions.escribir_en_elemento_por_id(driver, "idFichero", pdf_file)
+
         webFunctions.clickar_boton_por_id(driver, "btnForm")
         webFunctions.clickar_boton_por_id(driver, "bSiguiente")
         webFunctions.clickar_boton_por_id(driver, "idFirmarRegistrar")
@@ -208,20 +221,20 @@ def procesar_xml(xml_path, get_pdf_file_func):
         autoFirmaHandler.firmar_en_autofirma()
 
         regage = webFunctions.obtener_texto_por_parte(driver, "Descargar Justificante:").split()[-1]
-        logging.info(f"Código de justificante obtenido: {regage}")
+        logging.info("[INFO-03] Código de justificante obtenido: %s", regage)
 
         json_result = extraerXMLE3L.extraer_info_xml(xml_path, regage)
-        logging.info(f"Información extraída del XML: {json_result}")
+        logging.info("[INFO-04] Información extraída del XML: %s", json_result)
 
         return json_result
 
     except Exception as e:
-        logging.error(f"Error procesando '{os.path.basename(xml_path)}': {e}", exc_info=True)
+        logging.error("[ERR-02] Error procesando '%s': %s", os.path.basename(xml_path), e, exc_info=True)
     finally:
         try:
             driver.quit()
         except Exception as e_quit:
-            logging.error(f"Error cerrando driver: {e_quit}")
+            logging.error("[ERR-03] Error cerrando driver: %s", e_quit)
 
 def procesar_archivos_xml_en_subcarpetas():
     """
@@ -235,46 +248,30 @@ def procesar_archivos_xml_en_subcarpetas():
         return
 
     for subdir in subcarpetas:
-        logging.info(f"Procesando subcarpeta: {os.path.basename(subdir)}")
+        logging.info("[INFO-05] Procesando subcarpeta: %s", os.path.basename(subdir))
         xml_files = sorted([os.path.join(subdir, f) for f in os.listdir(subdir) if f.lower().endswith('.xml')])
-        pdf_files = [os.path.join(subdir, f) for f in os.listdir(subdir) if f.lower().endswith('.pdf')]
-        ultimo_nombre_productor = None
-
-        def get_pdf_file_sub():
-            for f in pdf_files:
-                if os.path.exists(f):
-                    logging.info(f"Archivo PDF encontrado: {f}")
-                    return f
-            logging.error(f"No se encontró ningún archivo PDF en la carpeta '{subdir}'.")
-            return None
 
         while xml_files:
             procesados_esta_vuelta = []
             for xml_file in xml_files:
                 try:
-                    resultado = procesar_xml(xml_file, get_pdf_file_sub)
+                    primera_palabra = os.path.basename(subdir).split()[0]
+                    resultado = procesar_xml(xml_file, primera_palabra)
                     if resultado is None:
                         continue
                     nombre_productor = resultado.get("nombre_productor", "desconocido").replace(" ", "_")
                     mover_a_trash(xml_file, nombre_productor)
-                    ultimo_nombre_productor = nombre_productor
                     procesados_esta_vuelta.append(xml_file)
                 except Exception as e:
-                    logging.error(f"Error procesando '{os.path.basename(xml_file)}': {e}")
+                    logging.error("[ERR-04] Error procesando '%s': %s", os.path.basename(xml_file), e)
 
             xml_files = sorted([os.path.join(subdir, f) for f in os.listdir(subdir) if f.lower().endswith('.xml')])
             if not procesados_esta_vuelta and xml_files:
-                logging.error(f"No se ha podido procesar ninguno de los archivos XML restantes en {subdir}.")
+                logging.error("[ERR-05] No se ha podido procesar ninguno de los archivos XML restantes en %s.", subdir)
                 break
+        logging.info("[INFO-06] Procesamiento completado para subcarpeta: %s", os.path.basename(subdir))
 
-        # Cuando no quedan XML, mover el PDF a la carpeta del último productor
-        pdf_file = get_pdf_file_sub()
-        if ultimo_nombre_productor and pdf_file and os.path.exists(pdf_file):
-            logging.info(f"Moviendo PDF '{os.path.basename(pdf_file)}' a la carpeta '{ultimo_nombre_productor}' en trash.")
-            mover_a_trash(pdf_file, ultimo_nombre_productor)
-        logging.info(f"Procesamiento completado para subcarpeta: {os.path.basename(subdir)}")
-
-    logging.info("Proceso completado. Todas las subcarpetas procesadas.")
+    logging.info("[INFO-07] Proceso completado. Todas las subcarpetas procesadas.")
 
 def notificar_contratos_tratamiento():
     excel_input = pd.read_excel(EXCEL_INPUT_DIR)
@@ -291,7 +288,7 @@ def notificar_contratos_tratamiento():
     webFunctions.clickar_boton_por_clase(driver, "miBoton.buscar")
     # Edita las notificaciones de peligrosos a: Sí
     excelFunctions.editar_notificaciones_peligrosos(driver)
-    logging.info("Notificaciones de peligrosos editadas correctamente.")
+    logging.info("[INFO-08] Notificaciones de peligrosos editadas correctamente.")
     driver.quit()
     
 def main():
@@ -302,7 +299,7 @@ def main():
     # logging.info("Notificaciones de contratos de tratamiento editadas correctamente.")
 
     procesar_archivos_xml_en_subcarpetas()
-    logging.info("Todos los procesos han finalizado correctamente.")
+    logging.info("[INFO-09] Todos los procesos han finalizado correctamente.")
 
 if __name__ == "__main__":
     main()
