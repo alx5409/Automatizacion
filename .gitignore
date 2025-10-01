@@ -1,0 +1,12 @@
+# Ignorar carpetas de compilación y salidas
+dist/
+build/
+descargas/
+entrada/
+input/
+output/
+trash/
+
+# Ignorar cachés de Python y archivos .spec
+__pycache__/
+*.spec

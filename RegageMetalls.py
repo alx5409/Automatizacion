@@ -244,7 +244,9 @@ def procesar_multiple_regages(max_registros=100):
             registros_procesados += 1
 
             # Mover el archivo procesado a la carpeta trash
-            trash_dir = os.path.join(BASE_DIR, "trash")
+            # Extrae el nombre del productor del registro
+            nombre_productor = registro.get("nombre_productor", "desconocido").replace(" ", "_")
+            trash_dir = os.path.join(BASE_DIR, "trash", nombre_productor)
             os.makedirs(trash_dir, exist_ok=True)
             destino = os.path.join(trash_dir, os.path.basename(ruta_json))
             try:
