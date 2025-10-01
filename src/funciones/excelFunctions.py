@@ -37,7 +37,7 @@ import logging
 import re
 import unicodedata
 import sys
-from config import BASE_DIR
+from src.utils.config import BASE_DIR
 import webFunctions
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -109,6 +109,22 @@ dic_codigos_residuos_valencia = {
     "SIR": "Sistema individual de Responsabilidad ampliada",
     "T01": "Transportista de residuos peligrosos",
     "T02": "Transportista de residuos no peligrosos"
+}
+
+# Configuración de fechas
+AÑOS_VIGENCIA_CONTRATO = 5
+AÑOS_VIGENCIA_CONTRATO_CORTO = 3
+
+# Empresas por defecto
+EMPRESA_DESTINO_DEFAULT = "METALLS DEL CAMP, S.L."
+OPERADOR_TRASLADOS_DEFAULT = "ECO TITAN S.L."
+
+# Autorizaciones por defecto
+AUTORIZACIONES = {
+    "valencia_peligroso": "157/G02/CV",
+    "valencia_no_peligroso": "374/G04/CV",
+    "otros_peligroso": "4570002919",
+    "otros_no_peligroso": "G04"
 }
 
 def _esperar_descarga(carpeta: str, extension: str = ".xlsx", timeout: int = 30) -> str:

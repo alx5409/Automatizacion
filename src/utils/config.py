@@ -18,3 +18,19 @@ def cargar_variables(filepath):
                     key, value = line.split('=', 1)
                     strings[key.strip()] = value.strip()
     return strings
+
+# Configuración de fechas
+AÑOS_VIGENCIA_CONTRATO = 5
+AÑOS_VIGENCIA_CONTRATO_CORTO = 3
+
+# Empresas por defecto
+EMPRESA_DESTINO_DEFAULT = "METALLS DEL CAMP, S.L."
+OPERADOR_TRASLADOS_DEFAULT = "ECO TITAN S.L."
+
+# Autorizaciones por defecto
+AUTORIZACIONES = {
+    "valencia_peligroso": "157/G02/CV",
+    "valencia_no_peligroso": "374/G04/CV",
+    "otros_peligroso": "4570002919",
+    "otros_no_peligroso": "G04"
+}
