@@ -29,7 +29,7 @@ import json
 import glob
 import sys
 import unicodedata
-import loggerConfig
+from utils import loggerConfig
 import tkinter as tk
 from tkinter import ttk
 import typing
@@ -51,18 +51,14 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # Imports de uiautomation
 import uiautomation as auto
-import uiautomationHandler
+import src.funciones.uiautomationHandler as uiautomationHandler
 
 # Imports propios del proyecto
-import autoFirmaHandler
-import certHandler
-import extraerXMLE3L
-import loggerConfig
-import webConfiguration
-import webFunctions
-import funcionesNubelus
-import excelFunctions
-from config import BASE_DIR, cargar_variables
+import src.funciones.autoFirmaHandler as autoFirmaHandler
+import src.funciones.certHandler as certHandler
+from funciones import extraerXMLE3L, webFunctions, funcionesNubelus, excelFunctions
+from utils import loggerConfig, webConfiguration
+from src.utils.config import BASE_DIR, cargar_variables
 from datetime import datetime, timedelta
 
 # Variables de configuración

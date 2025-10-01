@@ -24,12 +24,10 @@ import time
 from typing import List
 
 # Imports propios del proyecto
-import certHandler
-import downloadFunctions
-import webConfiguration
-import webFunctions
-import loggerConfig
-from config import BASE_DIR, cargar_variables
+import src.funciones.certHandler as certHandler
+from funciones import downloadFunctions, webFunctions
+from utils import webConfiguration, loggerConfig
+from src.utils.config import BASE_DIR, cargar_variables
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
 # Variables de configuración

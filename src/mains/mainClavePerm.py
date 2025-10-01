@@ -2,10 +2,9 @@ import time
 
 from selenium.webdriver.common.by import By
 
-import loggerConfig
+from utils import loggerConfig, webConfiguration
+from funciones import webFunctions
 import logging
-import webConfiguration
-import webFunctions
 
 WEB_MITECO = "https://sede.miteco.gob.es/portal/site/seMITECO/login?urlLoginRedirect=L3BvcnRhbC9zaXRlL3NlTUlURUNPL3BvcnRsZXRfYnVzP2lkX3Byb2NlZGltaWVudG89NzM2JmlkZW50aWZpY2Fkb3JfcGFzbz1QUkVJTklDSU8mc3ViX29yZ2Fubz0xMSZwcmV2aW9fbG9naW49MQ=="
 NOMBRE_CERT = "FRANCISCO JAV"

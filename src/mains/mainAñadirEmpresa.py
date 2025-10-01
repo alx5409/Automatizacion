@@ -18,13 +18,10 @@ Ejemplo de uso:
 """
 
 import time
-import loggerConfig
+from utils import loggerConfig, webConfiguration
 import logging
-import webConfiguration
+from funciones import excelFunctions, webFunctions, funcionesNubelus
 import pandas
-import excelFunctions
-import webFunctions
-import funcionesNubelus  # Módulo específico para la aplicación Nubelus
 
 
 # URLs de la aplicación Nubelus

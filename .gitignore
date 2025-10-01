@@ -214,6 +214,7 @@ input/
 output/
 trash/
 
-# Ignorar cachés de Python y archivos .spec
+# Ignorar cachés de Python y archivos .spec y .json
 __pycache__/
 *.spec
+*.json

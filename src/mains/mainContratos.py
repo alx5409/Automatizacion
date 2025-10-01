@@ -1,8 +1,6 @@
-import webConfiguration
+from utils import webConfiguration
 import pandas
-import excelFunctions
-import webFunctions
-import funcionesNubelus
+from funciones import excelFunctions, webFunctions, funcionesNubelus
 import time
 
 # URLs de la aplicación Nubelus

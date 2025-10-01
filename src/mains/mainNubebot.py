@@ -12,7 +12,7 @@ import json
 import glob
 import sys
 import unicodedata
-import loggerConfig
+from utils import loggerConfig
 import tkinter as tk
 from tkinter import ttk
 import typing
@@ -39,15 +39,9 @@ from selenium.webdriver.common.keys import Keys
 
 
 # Importar modulos del proyecto
-import funcionesNubelus
-import excelFunctions
-import uiautomationHandler
-import webConfiguration
-import webFunctions
-import config
-import loggerConfig
-import webConfiguration
-import mainNotificarCT
+from funciones import funcionesNubelus, excelFunctions, webFunctions, uiautomationHandler
+from utils import webConfiguration, loggerConfig, config
+from mains import mainNotificarCT
 
 
 

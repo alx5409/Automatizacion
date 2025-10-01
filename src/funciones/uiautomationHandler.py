@@ -30,7 +30,7 @@ Ejemplos de uso:
     )
 """
 
-import loggerConfig
+from utils import loggerConfig
 import uiautomation as auto
 import time
 import logging

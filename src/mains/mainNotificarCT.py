@@ -10,7 +10,7 @@ import json
 import glob
 import sys
 import unicodedata
-import loggerConfig
+from utils import loggerConfig
 import tkinter as tk
 from tkinter import ttk
 import typing
@@ -37,13 +37,8 @@ from selenium.webdriver.common.keys import Keys
 
 
 # Importar modulos del proyecto
-import funcionesNubelus
-import excelFunctions
-import webConfiguration
-import webFunctions
-import config
-import loggerConfig
-import webConfiguration
+from funciones import funcionesNubelus, excelFunctions, webFunctions
+from utils import webConfiguration, loggerConfig, config
 
 URL_CONTRATOS_TRATAMIENTOS = "https://portal.nubelus.es/?clave=waster2_gestionContratosTratamiento"
 RUTA_EXCEL_INPUT = "entrada/excel_input.xls"  # Ruta del Excel de entrada

@@ -23,12 +23,12 @@ Ejemplo de uso:
         logging.error("No se pudo seleccionar el certificado.")
 """
 
-import loggerConfig
+from utils import loggerConfig
 import uiautomation as auto
 import time
 import logging
 
-import uiautomationHandler
+import src.funciones.uiautomationHandler as uiautomationHandler
 
 def _seleccionar_certificado(lista_certificados, nombre_certificado):
     """

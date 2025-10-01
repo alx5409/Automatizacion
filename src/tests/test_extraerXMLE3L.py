@@ -1,6 +1,6 @@
 import os
 import json
-from extraerXMLE3L import extraer_info_xml, normalizar_nombre
+from funciones.extraerXMLE3L import extraer_info_xml, normalizar_nombre
 
 if __name__ == "__main__":
     # Ruta al XML de prueba

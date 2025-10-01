@@ -18,12 +18,9 @@ Ejemplo de uso:
 """
 
 import time
-import excelFunctions
-import loggerConfig
+from funciones import excelFunctions, webFunctions, funcionesNubelus
+from utils import loggerConfig, webConfiguration
 import logging
-import webConfiguration
-import webFunctions
-import funcionesNubelus  # Módulo específico para la aplicación Nubelus
 
 # URLs de la aplicación Nubelus
 WEB_NUBELUS = "https://portal.nubelus.es"

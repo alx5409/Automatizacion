@@ -1,13 +1,13 @@
 import logging
-from config import BASE_DIR
-import loggerConfig
+from src.utils.config import BASE_DIR
+from utils import loggerConfig
 import os
 import json
 import time
 from selenium import webdriver
 
-import webConfiguration
-import webFunctions
+from utils import webConfiguration
+from funciones import webFunctions
 
 WEB = "https://ash-speed.hetzner.com/"
 

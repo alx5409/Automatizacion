@@ -1,6 +1,6 @@
-import loggerConfig
+from utils import loggerConfig
 import logging
-import nimaFunctions
+import src.funciones.nimaFunctions as nimaFunctions
 import concurrent.futures
 import re
 import concurrent.futures

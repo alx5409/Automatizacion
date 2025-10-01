@@ -1,6 +1,6 @@
 import selenium
 from selenium import webdriver
-import webConfiguration
+from utils import webConfiguration
 import time
 URL_SEGURIDAD = "chrome://settings/security"
 # driver = webConfiguration.configure()

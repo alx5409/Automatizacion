@@ -25,9 +25,9 @@ Ejemplo de uso:
 
 import logging
 import time
-import loggerConfig
+from utils import loggerConfig
 import uiautomation
-import uiautomationHandler
+import src.funciones.uiautomationHandler as uiautomationHandler
 
 def enviar_enter_a_ventana(ventana_control):
     """

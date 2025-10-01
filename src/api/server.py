@@ -10,7 +10,7 @@ Ejemplo de uso del endpoint "busqueda-nima" mediante curl.exe:
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-import mainNima
+from mains import mainNima
 
 app = FastAPI()
 

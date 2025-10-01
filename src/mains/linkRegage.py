@@ -26,15 +26,12 @@ import logging
 from typing import List
 
 # Imports propios del proyecto
-import certHandler
-import downloadFunctions
-import webConfiguration
-import webFunctions
-import loggerConfig
-import extraerXMLE3L
+import src.funciones.certHandler as certHandler
+from funciones import downloadFunctions, webFunctions, extraerXMLE3L
+from utils import webConfiguration, loggerConfig
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from config import BASE_DIR, cargar_variables
+from src.utils.config import BASE_DIR, cargar_variables
 
 # Variables de configuración
 INFO_CERTS = os.path.join(BASE_DIR, "data", "informacionCerts.txt")

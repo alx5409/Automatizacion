@@ -9,7 +9,7 @@ en el endpoint correspondiente.
 
 import logging
 import webFunctions
-import webConfiguration
+from utils import webConfiguration
 import excelFunctions
 
 URL_NIMA_CASTILLA = "https://ireno.castillalamancha.es/forms/geref000.htm"

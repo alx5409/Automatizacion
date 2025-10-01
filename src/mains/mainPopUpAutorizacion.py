@@ -25,12 +25,8 @@ import time
 import logging
 import pandas
 import uiautomation as auto
-import certHandler
-import excelFunctions
-import loggerConfig
-import webConfiguration
-import webFunctions
-import funcionesNubelus
+from funciones import excelFunctions, webFunctions, funcionesNubelus, certHandler
+from utils import loggerConfig, webConfiguration
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
